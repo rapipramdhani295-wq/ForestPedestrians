@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Install Android NDK
@@ -22,23 +22,23 @@ jobs:
           ndk-version: r23c
           local-cache: true
 
-      - name: Build ARM64 Plugin
+      - name: Build ARM64
         run: |
           ndk-build \
-            NDK_PROJECT_PATH=. \
-            APP_BUILD_SCRIPT=./Android.mk \
-            NDK_APPLICATION_MK=./Application.mk \
+            NDK_PROJECT_PATH=ForestPedestrians \
+            APP_BUILD_SCRIPT=ForestPedestrians/Android.mk \
+            NDK_APPLICATION_MK=ForestPedestrians/Application.mk \
             NDK_DEBUG=0 \
             -j2
 
-      - name: Package Plugin
+      - name: Package plugin
         run: |
           mkdir -p release
-          cp libs/arm64-v8a/libForestPedestrians.so release/
+          cp ForestPedestrians/libs/arm64-v8a/libForestPedestrians.so release/
           cd release
-          zip -9 ForestPedestrians-arm64.zip libForestPedestrians.so
+          zip ForestPedestrians-arm64.zip libForestPedestrians.so
 
-      - name: Upload SO Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ForestPedestrians-arm64
