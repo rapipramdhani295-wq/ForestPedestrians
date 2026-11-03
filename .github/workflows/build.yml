@@ -1,0 +1,45 @@
+
+name: Build ForestPedestrians
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Compile Android Plugin
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Install Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r23c
+          local-cache: true
+
+      - name: Build ARM64 Plugin
+        run: |
+          ndk-build \
+            NDK_PROJECT_PATH=. \
+            APP_BUILD_SCRIPT=./Android.mk \
+            NDK_APPLICATION_MK=./Application.mk \
+            NDK_DEBUG=0 \
+            -j2
+
+      - name: Package Plugin
+        run: |
+          mkdir -p release
+          cp libs/arm64-v8a/libForestPedestrians.so release/
+          cd release
+          zip -9 ForestPedestrians-arm64.zip libForestPedestrians.so
+
+      - name: Upload SO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ForestPedestrians-arm64
+          path: release/*
