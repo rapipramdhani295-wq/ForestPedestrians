@@ -16,6 +16,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Extract project ZIP
+        run: |
+          unzip -q ForestPedestrians-GitHub.zip -d .
+
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
         with:
@@ -35,8 +39,6 @@ jobs:
         run: |
           mkdir -p release
           cp ForestPedestrians/libs/arm64-v8a/libForestPedestrians.so release/
-          cd release
-          zip ForestPedestrians-arm64.zip libForestPedestrians.so
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
