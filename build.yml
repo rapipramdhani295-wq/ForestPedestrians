@@ -1,0 +1,41 @@
+name: Build ForestPedestrians
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK r23c
+        run: sdkmanager "ndk;23.2.8568313"
+
+      - name: Build arm64 plugin
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/23.2.8568313"
+          "$ANDROID_NDK_HOME/ndk-build" \
+            NDK_PROJECT_PATH=. \
+            APP_BUILD_SCRIPT=./Android.mk \
+            NDK_APPLICATION_MK=./Application.mk \
+            -j2
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: ForestPedestrians-arm64
+          path: libs/arm64-v8a/libForestPedestrians.so
+          if-no-files-found: error
